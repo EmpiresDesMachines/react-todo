@@ -1,26 +1,34 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TodoList from './components/TodoList';
 import TodoField from './components/TodoField';
 
-import { useDispatch } from 'react-redux';
-import { addTodo } from './store/todoSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { addNewTodo, fetchTodos } from './store/todoSlice';
 
 function App() {
   const dispatch = useDispatch();
+  const { loading, error } = useSelector((store) => store.todo);
 
   const [text, setText] = useState('');
 
   const addTask = () => {
-    dispatch(addTodo({ text }));
+    dispatch(addNewTodo(text));
+
     setText('');
   };
 
   const handleInput = (text) => setText(text);
 
+  useEffect(() => {
+    dispatch(fetchTodos());
+  }, []);
+
   return (
     <div className="App">
       <h1>Todo</h1>
+      {loading && <h2>Loading...</h2>}
+      {error && <h2>{error}</h2>}
       <TodoField text={text} handleInput={handleInput} handleSubmit={addTask} />
       <TodoList />
     </div>
